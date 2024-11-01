@@ -39,4 +39,4 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.javascript.lcov.reportPaths=coverage-reports/lcov.info  # Adjust path based on where your coverage report is generated (default is coverage/lcov.info)
+            -Dsonar.javascript.lcov.reportPaths=coverage-reports/lcov.info
