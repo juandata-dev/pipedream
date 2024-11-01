@@ -1,23 +1,42 @@
 name: Build
+
 on:
   push:
     branches:
       - master
   pull_request:
     types: [opened, synchronize, reopened]
+
 jobs:
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
     steps:
+      # Checkout the code
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0  # Shallow clones should be disabled for better analysis
+
+      # Set up Node.js (adjust the version if necessary)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # Specify your project's Node.js version
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
       # Run tests and generate coverage report
       - name: Run tests and generate coverage
-        run: npm run test
+        run: npm run test -- --coverage  # Ensure this generates a coverage report in lcov format
+
+      # SonarCloud Scan with coverage report included
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.javascript.lcov.reportPaths=coverage-reports/lcov.info  # Adjust path based on where your coverage report is generated (default is coverage/lcov.info)
